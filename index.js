@@ -6,6 +6,7 @@ dotenv.config();
 
 const { connectDb, connection } = require("./db/dbConnect");
 const authRoutes = require("./Routes/authRoutes");
+const tasksRoutes = require("./Routes/taskRouts");
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.get("/", (req, res) => {
 
 // Routes
 app.use("/api", authRoutes);
+app.use("/api", tasksRoutes);
 
 app.listen(port, () => {
   console.log("Server is running on port 5000");

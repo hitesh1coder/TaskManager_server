@@ -6,25 +6,27 @@ const registerUser = async (req, res) => {
   const { name, email, password } = req.body;
   const encryptedPassword = await bcrypt.hash(password, 10);
 
-  connection.query(
-    "INSERT INTO todo_project.user (name,email, password) VALUES (?, ?,?)",
-    [name, email, encryptedPassword],
-    (err, results) => {
-      if (err) {
-        if (err.code === "ER_DUP_ENTRY") {
-          // Duplicate entry error (unique constraint violation)
-          return res
-            .status(409)
-            .json({ error: "Email address is already registered" });
-        } else {
-          console.error("Error registering user:", err);
-          return res.status(500).json({ error: "Internal Server Error" });
-        }
+  const sql =
+    "INSERT INTO todo_project.user (name,email, password) VALUES (?, ?,?)";
+  let value = [name, email, encryptedPassword];
+
+  connection.query(sql, value, (err, results) => {
+    if (err) {
+      if (err.code === "ER_DUP_ENTRY") {
+        // Duplicate entry error (unique constraint violation)
+        return res
+          .status(409)
+          .json({ message: "Email address is already registered" });
       } else {
-        res.status(201).json({ message: "User registered successfully" });
+        console.error("Error registering user:", err);
+        return res.status(500).json({ message: "Internal Server Error" });
       }
+    } else {
+      res.status(201).json({
+        message: "User registered successfully",
+      });
     }
-  );
+  });
 };
 
 const loginUser = async (req, res) => {
@@ -46,12 +48,16 @@ const loginUser = async (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: "1h" }
           );
-          res.json({ token, user: results[0] });
+          res.status(200).json({
+            message: "user Login Successfull",
+            token,
+            user: results[0],
+          });
         } else {
-          res.status(401).json({ error: "Invalid credentials" });
+          res.status(401).json({ message: "Invalid credentials" });
         }
       } else {
-        res.status(401).json({ error: "Invalid credentials" });
+        res.status(401).json({ message: "Invalid credentials" });
       }
     }
   );

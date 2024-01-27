@@ -1,3 +1,7 @@
+# TeckStack
+
+Node JS, Express, Mysql
+
 ## Installation
 
 first you need to clone this repo :-
